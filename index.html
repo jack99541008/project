@@ -24,7 +24,7 @@
   <body>
   
 	<div id="changepiece">
-	<canvas id="change" width="160" height="160"></canvas>
+	<canvas id="change" width="200" height="200"></canvas>
 	</div>
 	
     <div id="gameboard">
@@ -35,6 +35,7 @@
 	
 	<div id="score">
 	<p>Lines: <span id="lines"></span></p>
+	<p>MAX Lines: <span id="maxlines"></span></p>
 	</div>
 	
 	<script type="text/javascript">
@@ -58,7 +59,9 @@
 		var isGameOver;
 		var ischange;
 		var lineSpan;
+		var maxlineSpan;
 		var curLines;
+		var maxscore=0;
 		var touchX;
 		var touchY;
 		var touchId;
@@ -81,7 +84,7 @@
 			change = document.getElementById('change');
 			cctx = change.getContext('2d');
 			lineSpan = document.getElementById('lines');
-			
+			maxlineSpan = document.getElementById('maxlines');
 			prevTime = curTime = 0;
 			
 			document.onkeydown = getInput;
@@ -126,11 +129,11 @@
 					}
 				}
 			}
-			
+			cctx.clearRect(0, 0, 200, 200);
 			curPiece = getRandomPiece();
 			
 			lineSpan.innerHTML = curLines.toString();
-			
+			maxlineSpan.innerHTML = maxscore;
 			var requestAnimFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
 									window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 									
@@ -171,7 +174,12 @@
 					requestAnimationFrame(update);
 				}
 				else
+				{
+					if(curLines>maxscore)
+						maxscore=curLines;
+					maxlineSpan.innerHTML = maxscore;
 					ctx.drawImage(gameOverImg, 0, 0, 320, 640, 0, 0, 320, 640);
+				}
 		}
 
 		function copyData(p)
@@ -408,7 +416,7 @@
 					
 					case 67:
 					{
-						if(ischange==false)
+						if(ischange!=true)
 						{
 							changepiece=curPiece;
 							curPiece=getRandomPiece();
@@ -429,13 +437,13 @@
 						else
 						{
 							cctx.clearRect(0, 0, 200, 200)
-							
+							console.log(2);
 							var temp=changepiece;
 							changepiece=curPiece;
 							curPiece=temp;
 							curPiece.gridx=4;
 							curPiece.gridy=0;
-							ctx.drawPiece(curPiece);
+							
 							var cha=changepiece;
 							var cstate = cha.curState;
 							for(var r = 0, len = cha.states[cstate].length; r < len; r++)
